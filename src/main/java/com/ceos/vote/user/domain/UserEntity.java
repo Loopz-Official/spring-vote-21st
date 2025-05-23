@@ -15,11 +15,8 @@ import lombok.*;
 public class UserEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
-
-    // fk 분리용
-    @Column(nullable = false)
-    private String userId;
 
     //가입할 때 작성할 ID
     @Column(nullable = false, unique = true, length = 100)

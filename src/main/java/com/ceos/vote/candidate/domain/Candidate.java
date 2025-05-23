@@ -18,11 +18,8 @@ import java.util.List;
 public abstract class Candidate extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "candidate_id")
     private Long id;
-
-    //fk 분리용
-    @Column(nullable = false)
-    private String candidateId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
