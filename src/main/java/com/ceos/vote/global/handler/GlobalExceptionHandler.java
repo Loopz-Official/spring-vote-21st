@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
                                                                                      HttpServletRequest request) {
 
         ResponseError responseError = new ResponseError();
-        responseError.setMessageDetail("요청 본문이 누락되었습니다. NOT NULL 검증 실패");
+        responseError.setMessageDetail("요청 본문이 누락되었거나 적절하지 않습니다");
         responseError.setErrorDetail(ex.getLocalizedMessage());
         responseError.setPath(request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseError);
