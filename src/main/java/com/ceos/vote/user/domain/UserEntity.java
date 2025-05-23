@@ -3,6 +3,7 @@ package com.ceos.vote.user.domain;
 import com.ceos.vote.candidate.domain.enums.Part;
 import com.ceos.vote.candidate.domain.enums.Team;
 import com.ceos.vote.global.domain.BaseTimeEntityWithDeletion;
+import com.ceos.vote.user.dto.request.RequestJoin;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -47,6 +48,9 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
     @Enumerated(STRING)
     private Role role;
 
+    private boolean isDeleted;
+    private boolean isEnabled;
+
 
     public static UserEntity of(String loginId, String realName, String password, String email, Part part, Team team) {
         return UserEntity.builder()
@@ -59,10 +63,25 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
                 .build();
     }
 
-    @Builder(access = PRIVATE)
-    private UserEntity(String loginId, String realName, String password, String email, Part part, Team team) {
-        this.role = USER;
+    public static UserEntity from(RequestJoin requestJoin) {
+        return UserEntity.builder()
+                .loginId(requestJoin.loginId())
+                .realName(requestJoin.realName())
+                .password(requestJoin.password())
+                .email(requestJoin.email())
+                .part(requestJoin.part())
+                .team(requestJoin.team())
+                .role(USER)
+                .build();
+    }
 
+    @Builder(access = PRIVATE)
+    private UserEntity(String loginId, String realName, String password, String email, Part part, Team team, Role role) {
+
+        this.isDeleted = false;
+        this.isEnabled = true;
+
+        this.role = role;
         this.loginId = loginId;
         this.realName = realName;
         this.password = password;
