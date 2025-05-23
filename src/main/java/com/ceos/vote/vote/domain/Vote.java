@@ -16,12 +16,10 @@ public class Vote extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch= FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity voter;
+    @Column(nullable = false)
+    private String userId;
 
-    @ManyToOne(fetch= FetchType.LAZY)
-    @JoinColumn(name = "candidate_id")
-    private Candidate candidate;
+    @Column(nullable = false)
+    private String candidateId;
 
 }

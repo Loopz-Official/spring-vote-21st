@@ -15,13 +15,17 @@ import lombok.*;
 public class UserEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="user_id")
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    // fk 분리용
+    @Column(nullable = false)
     private String userId;
 
-    private String username;
+    //가입할 때 작성할 ID
+    @Column(nullable = false, unique = true, length = 100)
+    private String loginId;
+
+    private String realName;
 
     private String password;
 
