@@ -14,14 +14,13 @@ import lombok.*;
 public class Vote extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "vote_id")
     private Long id;
 
-    @ManyToOne(fetch= FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity voter;
+    @Column(nullable = false)
+    private Long userId;
 
-    @ManyToOne(fetch= FetchType.LAZY)
-    @JoinColumn(name = "candidate_id")
-    private Candidate candidate;
+    @Column(nullable = false)
+    private Long candidateId;
 
 }
