@@ -37,4 +37,4 @@ out/
 .vscode/
 
 application-prod.yml
-
+application-jwt.yml

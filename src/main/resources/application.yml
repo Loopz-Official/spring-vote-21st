@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: local, jwt, oauth
+    include: local, jwt
 
   datasource:
     url: jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
@@ -9,7 +9,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
@@ -19,3 +19,29 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+
+jwt:
+  expiration:
+    access: ${ACCESS_EXPIRATION:1_800_000}
+    refresh: ${REFRESH_EXPIRATION:2_592_000_000}
+  secret: ${JWT_SECRET:test1234tes1tte2st1234test1te!stte7stt@#e4sttes5ttest2testtest1234123415215161231}
+
+etc:
+  base-url: ${BASE_URL}
+  front-url: ${FRONT_URL}
+  front-auth-success: ${FRONT_URL}/auth/success
+
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: when_authorized
+logging:
+  level:
+    web: debug
+    org.springframework.security: debug
