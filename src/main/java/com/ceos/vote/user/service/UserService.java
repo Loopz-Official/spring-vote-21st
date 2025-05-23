@@ -21,7 +21,9 @@ public class UserService {
 
     public UserDto join(RequestJoin requestJoin) {
 
-        UserEntity user = UserEntity.from(requestJoin);
+        String encoded = passwordEncoder.encode(requestJoin.password());
+        UserEntity user = UserEntity.from(requestJoin, encoded);
+
         userRepository.save(user);
 
         return UserDto.from(user);
