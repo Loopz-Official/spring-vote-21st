@@ -15,13 +15,14 @@ import lombok.*;
 public class UserEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="user_id")
+    @Column(name = "user_id")
     private Long id;
 
+    //가입할 때 작성할 ID
     @Column(nullable = false, unique = true, length = 100)
-    private String userId;
+    private String loginId;
 
-    private String username;
+    private String realName;
 
     private String password;
 

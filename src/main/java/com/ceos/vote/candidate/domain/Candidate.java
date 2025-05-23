@@ -18,7 +18,7 @@ import java.util.List;
 public abstract class Candidate extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="candidate_id")
+    @Column(name = "candidate_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -27,8 +27,5 @@ public abstract class Candidate extends BaseEntity {
 
     //득표수
     private int voteCount;
-
-    @OneToMany(mappedBy = "candidate")
-    private List<Vote> votes = new ArrayList<>();
 
 }
