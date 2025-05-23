@@ -4,6 +4,7 @@ import com.ceos.vote.candidate.domain.enums.Part;
 import com.ceos.vote.candidate.domain.enums.Team;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record RequestJoin(
 
@@ -14,11 +15,11 @@ public record RequestJoin(
         @NotBlank
         @Email
         String email,
-        @NotBlank
+        @NotNull
         Part part,
         @NotBlank
         String realName,
-        @NotBlank
+        @NotNull
         Team team
 ) {
 }

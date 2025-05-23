@@ -27,7 +27,9 @@ public class UserService {
         return UserDto.from(user);
     }
 
-    public UserEntity findUserByIdReturnEntity(Long userId) {
+    //TODO: 존재하는 이메일이면 throw
+
+    public UserEntity findUserThrowIfNotFound(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new AuthException(USER_NOT_FOUND));
     }
