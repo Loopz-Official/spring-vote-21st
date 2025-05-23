@@ -20,7 +20,4 @@ public abstract class Candidate extends BaseTimeEntity {
     @Column(nullable = false)
     private CandidateType type;
 
-    //득표수
-    private int voteCount;
-
 }
