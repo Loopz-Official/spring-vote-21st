@@ -1,0 +1,30 @@
+services:
+
+  cache:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - vote_network
+
+  application:
+    container_name: vote_be
+    image: gothax2/vote:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - cache
+    env_file:
+      - .env
+    networks:
+      - vote_network
+
+volumes:
+  redis_data:
+
+networks:
+  vote_network:
+    driver: bridge
