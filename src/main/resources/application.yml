@@ -26,11 +26,6 @@ jwt:
     refresh: ${REFRESH_EXPIRATION:2_592_000_000}
   secret: ${JWT_SECRET:test1234tes1tte2st1234test1te!stte7stt@#e4sttes5ttest2testtest1234123415215161231}
 
-etc:
-  base-url: ${BASE_URL}
-  front-url: ${FRONT_URL}
-  front-auth-success: ${FRONT_URL}/auth/success
-
 management:
   server:
     port: 8080
@@ -40,7 +35,7 @@ management:
         include: health
   endpoint:
     health:
-      show-details: when_authorized
+      show-details: always
 logging:
   level:
     web: debug
