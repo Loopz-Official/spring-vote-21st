@@ -5,6 +5,7 @@ import com.ceos.vote.security.filter.JwtAuthorizationFilter;
 import com.ceos.vote.security.filter.JwtExceptionFilter;
 import com.ceos.vote.security.handler.JwtAuthenticationFailureHandler;
 import com.ceos.vote.security.handler.JwtAuthenticationSuccessHandler;
+import com.ceos.vote.security.handler.JwtLogoutSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,7 @@ public class SecurityConfig {
 
     private final CorsConfig corsConfig;
 
+    private final JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
     private final JwtAuthenticationSuccessHandler jwtAuthenticationSuccessHandler;
@@ -59,6 +61,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST).permitAll()
                         .anyRequest().authenticated()
+                )
+
+                // 로그아웃 추가
+                .logout(logout -> logout
+                        .logoutUrl("/user/v1/logout")
+                        .logoutSuccessHandler(jwtLogoutSuccessHandler)
+                        .permitAll()
                 )
 
                 // 필터 추가
