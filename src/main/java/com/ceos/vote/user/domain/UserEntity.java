@@ -1,18 +1,26 @@
 package com.ceos.vote.user.domain;
 
-import com.ceos.vote.global.domain.BaseEntity;
 import com.ceos.vote.candidate.domain.enums.Part;
 import com.ceos.vote.candidate.domain.enums.Team;
+import com.ceos.vote.global.domain.BaseTimeEntityWithDeletion;
+import com.ceos.vote.user.dto.request.RequestJoin;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+import static com.ceos.vote.user.domain.Role.*;
+import static jakarta.persistence.EnumType.*;
+import static lombok.AccessLevel.*;
 
 @Entity
 @Table(name = "`user`")
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserEntity extends BaseEntity {
+@NoArgsConstructor(access = PROTECTED)
+@SQLDelete(sql = "UPDATE `user` SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
+public class UserEntity extends BaseTimeEntityWithDeletion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -29,12 +37,56 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     @Column(nullable = false)
     private Part part;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     @Column(nullable = false)
     private Team team;
 
+    @Enumerated(STRING)
+    private Role role;
+
+    private boolean isDeleted;
+    private boolean isEnabled;
+
+
+    public static UserEntity of(String loginId, String realName, String password, String email, Part part, Team team) {
+        return UserEntity.builder()
+                .loginId(loginId)
+                .realName(realName)
+                .password(password)
+                .email(email)
+                .part(part)
+                .team(team)
+                .build();
+    }
+
+    public static UserEntity from(RequestJoin requestJoin, String encodedPassword) {
+        return UserEntity.builder()
+                .loginId(requestJoin.loginId())
+                .realName(requestJoin.realName())
+                .password(encodedPassword)
+                .email(requestJoin.email())
+                .part(requestJoin.part())
+                .team(requestJoin.team())
+                .role(USER)
+                .build();
+    }
+
+    @Builder(access = PRIVATE)
+    private UserEntity(String loginId, String realName, String password, String email, Part part, Team team, Role role) {
+
+        this.isDeleted = false;
+        this.isEnabled = true;
+
+        this.role = role;
+        this.loginId = loginId;
+        this.realName = realName;
+        this.password = password;
+        this.email = email;
+        this.part = part;
+        this.team = team;
+    }
 }
