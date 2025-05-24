@@ -58,3 +58,16 @@
 - **1명 이상 승인(approve)** 후 merge 가능
 - merge 전 Gemini Code Review를 통한 1차 자체 수정
 - 본인 PR은 본인 **직접 Merge**
+
+
+### 5. 과제 내용
+
+![](https://velog.velcdn.com/images/grammi_boii/post/279e269c-9ec8-4769-b69d-7f3b2a239d13/image.png)
+
+- AWS ALB, RDS, EC2, Route 53을 사용해 배포
+- 서브 도메인 사용
+  - vote.loopz.co.kr (이번 과제 경로)
+  - api.loopz.co.kr (프로젝트 경로)
+  - loopz.co.kr (메인 페이지) OR vercel
+
+![](https://velog.velcdn.com/images/grammi_boii/post/7dc5496e-559b-4ff1-8846-b763bdbe6764/image.png)
