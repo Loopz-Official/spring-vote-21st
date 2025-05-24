@@ -1,8 +1,6 @@
 package com.ceos.vote.vote.domain;
 
-import com.ceos.vote.candidate.domain.Candidate;
-import com.ceos.vote.global.domain.BaseEntity;
-import com.ceos.vote.user.domain.UserEntity;
+import com.ceos.vote.global.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +9,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Vote extends BaseEntity {
+public class Vote extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vote_id")
