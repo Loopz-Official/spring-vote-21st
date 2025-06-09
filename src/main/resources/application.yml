@@ -36,7 +36,3 @@ management:
   endpoint:
     health:
       show-details: always
-logging:
-  level:
-    web: debug
-    org.springframework.security: debug
