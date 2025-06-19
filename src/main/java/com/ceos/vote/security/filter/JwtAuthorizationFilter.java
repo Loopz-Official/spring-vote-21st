@@ -72,7 +72,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if (!jwtProvider.validateToken(accessToken)) {
 
             String userId = jwtProvider.getSubject(accessToken);
-            Optional<RefreshToken> optionalRefresh = refreshTokenRedisService.findRefreshToken(Long.parseLong(userId));
+            Optional<RefreshToken> optionalRefresh = refreshTokenRedisService.findRefreshToken(userId);
             // refresh 만료 - redis 존재하지 않음
             checkRefreshExpire(optionalRefresh);
 

@@ -13,7 +13,7 @@ public class RefreshTokenRedisService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public void saveRefreshToken(Long userId, String refreshToken, Long ttl) {
+    public void saveRefreshToken(String userId, String refreshToken, Long ttl) {
 
         RefreshToken token = RefreshToken.builder()
                 .userId(userId)
@@ -24,12 +24,13 @@ public class RefreshTokenRedisService {
         refreshTokenRepository.save(token);
     }
 
-    public Optional<RefreshToken> findRefreshToken(Long userId) {
+    public Optional<RefreshToken> findRefreshToken(String userId) {
         return refreshTokenRepository.findById(userId);
     }
 
-    public void deleteRefreshToken(Long userId) {
-        refreshTokenRepository.deleteById(userId);
+
+    public void deleteRefreshToken(String userId) {
+        refreshTokenRepository.deleteByUserId(userId);
     }
 
 }
