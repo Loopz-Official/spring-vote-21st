@@ -54,7 +54,7 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
 
     private String findUserIdFromAuthentication(Authentication authentication) {
         PrincipalUserDetails principal = (PrincipalUserDetails) authentication.getPrincipal();
-        return principal.getUserEntity().getUserId();
+        return principal.getUserEntity().getId().toString();
     }
 
     private void writeBodyWithUserDto(HttpServletResponse response, Authentication authentication) throws IOException {

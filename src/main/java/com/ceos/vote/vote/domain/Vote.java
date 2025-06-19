@@ -16,7 +16,7 @@ public class Vote extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String userId;
+    private Long userId;
 
     @Column(nullable = false)
     private Long candidateId;

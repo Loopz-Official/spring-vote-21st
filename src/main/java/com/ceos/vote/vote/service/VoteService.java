@@ -9,6 +9,7 @@ import com.ceos.vote.vote.Exception.VoteException;
 import com.ceos.vote.vote.domain.Vote;
 import com.ceos.vote.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import static com.ceos.vote.vote.Exception.VoteErrorCode.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class VoteService {
 
     private final VoteRepository voteRepository;
@@ -25,7 +27,7 @@ public class VoteService {
     private final CandidateRepository candidateRepository;
 
     @Transactional
-    public void votePartLeader(String userId, Long candidateId) {
+    public void votePartLeader(Long userId, Long candidateId) {
 
         // 후보 존재 확인
         Candidate candidate = candidateRepository.findById(candidateId)

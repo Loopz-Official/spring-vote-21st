@@ -22,13 +22,14 @@ public class VoteController {
 
     private final VoteService voteService;
 
-    @PostMapping
-    public ResponseEntity<String> votePartLeader(@AuthenticationPrincipal User currentUser,
+    @PostMapping("/partLeader")
+    public ResponseEntity<Void> votePartLeader(@AuthenticationPrincipal User currentUser,
                                        @RequestBody VoteRequestDto request) {
 
         String userId = currentUser.getUsername();
+        System.out.println("Current User ID: " + userId);
 
-        voteService.votePartLeader(userId, request.CandidateId());
+        voteService.votePartLeader(Long.parseLong(userId), request.candidateId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

@@ -30,8 +30,9 @@ public class UserService {
     }
 
 
-    public UserEntity findByUserId(String userId) {
-        return userRepository.findByUserId(userId)
+    public UserEntity findByUserId(Long userId) {
+        System.out.println("UserService findByUserId called with userId = " + userId);
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new AuthException(USER_NOT_FOUND, String.format("User with ID %s not found", userId)));
     }
 }
