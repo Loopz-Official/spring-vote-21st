@@ -29,7 +29,6 @@ public class VoteController {
         String userId = currentUser.getUsername();
         log.info("Authenticated userId: {}", userId);
 
-
         voteService.votePartLeader(Long.parseLong(userId), request.candidateId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

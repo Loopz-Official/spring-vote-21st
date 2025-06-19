@@ -40,10 +40,11 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        String userId = findUserIdFromAuthentication(authentication);
+        Long userId = findUserIdFromAuthentication(authentication);
 
-        String accessToken = jwtProvider.generateAccessToken(authentication, userId);
-        String refreshToken = jwtProvider.generateRefreshToken(authentication, userId);
+
+        String accessToken = jwtProvider.generateAccessToken(authentication, userId.toString());
+        String refreshToken = jwtProvider.generateRefreshToken(authentication, userId.toString());
 
         refreshTokenRedisService.saveRefreshToken(userId, refreshToken, refreshTokenExpiration);
 
@@ -52,9 +53,9 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
         writeBodyWithUserDto(response, authentication);
     }
 
-    private String findUserIdFromAuthentication(Authentication authentication) {
+    private Long findUserIdFromAuthentication(Authentication authentication) {
         PrincipalUserDetails principal = (PrincipalUserDetails) authentication.getPrincipal();
-        return principal.getUserEntity().getId().toString();
+        return principal.getUserEntity().getId();
     }
 
     private void writeBodyWithUserDto(HttpServletResponse response, Authentication authentication) throws IOException {
