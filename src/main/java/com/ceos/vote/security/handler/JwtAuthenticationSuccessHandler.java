@@ -2,6 +2,7 @@ package com.ceos.vote.security.handler;
 
 import com.ceos.vote.global.dto.CommonResponse;
 import com.ceos.vote.redis.service.RefreshTokenRedisService;
+import com.ceos.vote.security.constants.SecurityConstants;
 import com.ceos.vote.security.dto.PrincipalUserDetails;
 import com.ceos.vote.security.jwt.JwtProvider;
 import com.ceos.vote.user.dto.UserDto;
@@ -12,11 +13,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
+import static com.ceos.vote.security.constants.SecurityConstants.*;
+import static org.springframework.http.HttpHeaders.*;
 
 @Component
 @Slf4j
@@ -42,7 +47,8 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
 
         refreshTokenRedisService.saveRefreshToken(Long.parseLong(userId), refreshToken, refreshTokenExpiration);
 
-        response.setHeader("access", accessToken);
+        String bearerAccess = TOKEN_PREFIX + accessToken;
+        response.setHeader(AUTHORIZATION, bearerAccess);
         writeBodyWithUserDto(response, authentication);
     }
 

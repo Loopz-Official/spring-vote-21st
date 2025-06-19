@@ -2,6 +2,7 @@ package com.ceos.vote.security.filter;
 
 import com.ceos.vote.redis.entity.RefreshToken;
 import com.ceos.vote.redis.service.RefreshTokenRedisService;
+import com.ceos.vote.security.exception.SecurityErrorCode;
 import com.ceos.vote.security.exception.TokenException;
 import com.ceos.vote.security.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.ceos.vote.security.exception.SecurityErrorCode.REFRESH_EXPIRED;
+import static com.ceos.vote.security.constants.SecurityConstants.TOKEN_PREFIX;
 
 
 @Component
@@ -32,7 +34,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = request.getHeader("access");
+
+        String accessToken = extractAccessTokenFromHeader(request);
 
         if (accessToken == null || accessToken.isEmpty()) {
             filterChain.doFilter(request, response);
@@ -44,7 +47,26 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         validateAndReissue(response, accessToken);
         setAuthentication(accessToken);
         filterChain.doFilter(request, response);
+
     }
+
+    private String extractAccessTokenFromHeader(HttpServletRequest request) {
+
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (header != null && header.startsWith(TOKEN_PREFIX)) {
+            return header.replace(TOKEN_PREFIX, "");
+        }
+
+        return null;
+    }
+
+
+    private void setAuthentication(String accessToken) {
+        Authentication authentication = jwtProvider.getAuthentication(accessToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
 
     private void validateAndReissue(HttpServletResponse response, String accessToken) {
         if (!jwtProvider.validateToken(accessToken)) {
@@ -55,30 +77,26 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             checkRefreshExpire(optionalRefresh);
 
             // refresh redis에 존재하고 유효
-            reIssueAccess(response, optionalRefresh);
+            reissueAccess(response, optionalRefresh);
         }
-
     }
 
-    private void setAuthentication(String accessToken) {
-        Authentication authentication = jwtProvider.getAuthentication(accessToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
 
     private void checkRefreshExpire(Optional<RefreshToken> optionalRefresh) {
         if (optionalRefresh.isEmpty()) {
             log.debug("Refresh token is not found. Redirect to login page.");
-            throw new TokenException(REFRESH_EXPIRED);
+            throw new TokenException(SecurityErrorCode.REFRESH_EXPIRED);
         }
     }
 
-    private void reIssueAccess(HttpServletResponse response, Optional<RefreshToken> optionalRefresh) {
+    private void reissueAccess(HttpServletResponse response, Optional<RefreshToken> optionalRefresh) {
         String refreshToken = optionalRefresh.get().getRefreshToken();
         if (jwtProvider.validateToken(refreshToken)) {
             // 재발급
             String newAccessToken = jwtProvider.reissueWithRefresh(refreshToken);
-            response.setHeader("access", newAccessToken);
+            response.setHeader(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + newAccessToken);
         }
     }
+
 
 }
