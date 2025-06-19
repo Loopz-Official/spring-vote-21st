@@ -14,4 +14,6 @@ public class PartLeader extends Candidate {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Part part;
+
+    private String name;
 }

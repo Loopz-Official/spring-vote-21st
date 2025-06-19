@@ -9,6 +9,8 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.UUID;
+
 import static com.ceos.vote.user.domain.Role.*;
 import static jakarta.persistence.EnumType.*;
 import static lombok.AccessLevel.*;
@@ -23,8 +25,9 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long id;
+
+    private String userId;
 
     //가입할 때 작성할 ID
     @Column(nullable = false, unique = true, length = 100)
@@ -80,6 +83,8 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
 
         this.isDeleted = false;
         this.isEnabled = true;
+
+        this.userId = UUID.randomUUID().toString();
 
         this.role = role;
         this.loginId = loginId;
