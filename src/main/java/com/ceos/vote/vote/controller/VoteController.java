@@ -27,6 +27,8 @@ public class VoteController {
                                        @RequestBody VoteRequestDto request) {
 
         String userId = currentUser.getUsername();
+        log.info("Authenticated userId: {}", userId);
+
 
         voteService.votePartLeader(userId, request.CandidateId());
 

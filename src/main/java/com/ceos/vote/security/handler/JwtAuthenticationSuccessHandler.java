@@ -45,7 +45,7 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
         String accessToken = jwtProvider.generateAccessToken(authentication, userId);
         String refreshToken = jwtProvider.generateRefreshToken(authentication, userId);
 
-        refreshTokenRedisService.saveRefreshToken(Long.parseLong(userId), refreshToken, refreshTokenExpiration);
+        refreshTokenRedisService.saveRefreshToken(userId, refreshToken, refreshTokenExpiration);
 
         String bearerAccess = TOKEN_PREFIX + accessToken;
         response.setHeader(AUTHORIZATION, bearerAccess);
