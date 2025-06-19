@@ -48,7 +48,7 @@ public class VoteService {
 
         // 중복 투표 확인
         if (voteRepository.existsByUserId(userId)) {
-            throw new VoteException(ALREADY_VOTED, "userId: " + userId);
+            throw new VoteException(ALREADY_VOTED);
         }
 
         // 투표 저장

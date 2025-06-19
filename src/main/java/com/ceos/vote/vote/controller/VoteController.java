@@ -27,7 +27,6 @@ public class VoteController {
                                        @RequestBody VoteRequestDto request) {
 
         String userId = currentUser.getUsername();
-        System.out.println("Current User ID: " + userId);
 
         voteService.votePartLeader(Long.parseLong(userId), request.candidateId());
 
