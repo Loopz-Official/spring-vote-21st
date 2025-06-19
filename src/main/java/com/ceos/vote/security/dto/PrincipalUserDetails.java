@@ -39,7 +39,7 @@ public class PrincipalUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getUsername() {
-        return userEntity.getEmail();
+        return userEntity.getId().toString();
     }
 
     @Override
