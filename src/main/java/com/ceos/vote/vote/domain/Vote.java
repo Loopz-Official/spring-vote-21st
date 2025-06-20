@@ -1,5 +1,6 @@
 package com.ceos.vote.vote.domain;
 
+import com.ceos.vote.candidate.domain.Candidate;
 import com.ceos.vote.global.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +19,16 @@ public class Vote extends BaseTimeEntity {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
-    private Long candidateId;
+    @JoinColumn(name = "candidate_id", referencedColumnName = "candidate_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Candidate candidate;
+
+
+    public static Vote of(Long userId, Candidate candidate) {
+        return Vote.builder()
+                .userId(userId)
+                .candidate(candidate)
+                .build();
+    }
 
 }

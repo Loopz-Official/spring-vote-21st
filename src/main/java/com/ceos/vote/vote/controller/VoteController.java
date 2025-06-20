@@ -1,8 +1,6 @@
 package com.ceos.vote.vote.controller;
 
-import com.ceos.vote.vote.dto.CandidateListResponse;
-import com.ceos.vote.vote.dto.CandidateResultListResponse;
-import com.ceos.vote.vote.dto.VoteRequestDto;
+import com.ceos.vote.vote.dto.*;
 import com.ceos.vote.vote.service.VoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,27 +19,33 @@ public class VoteController {
     private final VoteService voteService;
 
     @PostMapping("/leader")
-    public ResponseEntity<String> votePartLeader(@AuthenticationPrincipal User currentUser,
-                                       @RequestBody VoteRequestDto request) {
+    public ResponseEntity<CandidateResultResponse> votePartLeader(
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody VoteRequestDto request)
+    {
 
         String userId = currentUser.getUsername();
         log.info("Authenticated userId: {}", userId);
 
-        voteService.votePartLeader(Long.parseLong(userId), request.candidateId());
+        CandidateResultResponse response
+                = voteService.votePartLeader(Long.parseLong(userId), request.candidateId());
 
-        return ResponseEntity.status(HttpStatus.OK).body("Vote successful for part leader");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/demoday")
-    public ResponseEntity<String> voteDemoday(@AuthenticationPrincipal User currentUser,
-                                           @RequestBody VoteRequestDto request) {
+    public ResponseEntity<CandidateResultResponse> voteDemoday(
+            @AuthenticationPrincipal User currentUser,
+            @RequestBody VoteRequestDto request
+    ) {
 
         String userId = currentUser.getUsername();
         log.info("Authenticated userId: {}", userId);
 
-        voteService.voteDemoday(Long.parseLong(userId), request.candidateId());
+        CandidateResultResponse response
+                = voteService.voteDemoday(Long.parseLong(userId), request.candidateId());
 
-        return ResponseEntity.status(HttpStatus.OK).body("Vote successful for demoday");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 

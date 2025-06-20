@@ -1,7 +1,6 @@
 package com.ceos.vote.vote.service;
 
 import com.ceos.vote.candidate.Repository.CandidateRepository;
-import com.ceos.vote.candidate.Repository.PartLeaderRepository;
 import com.ceos.vote.candidate.domain.Candidate;
 import com.ceos.vote.candidate.domain.Demoday;
 import com.ceos.vote.candidate.domain.PartLeader;
@@ -21,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 import static com.ceos.vote.vote.Exception.VoteErrorCode.*;
@@ -39,86 +37,41 @@ public class VoteService {
     private final VoteConverter voteConverter;
 
     @Transactional
-    public void votePartLeader(Long userId, Long candidateId) {
+    public CandidateResultResponse votePartLeader(Long userId, Long candidateId) {
 
         // 후보 존재 확인
-        Candidate candidate = candidateRepository.findById(candidateId)
-                .orElseThrow(() -> new VoteException(CANDIDATE_NOT_FOUND));
-
-        if (!(candidate instanceof PartLeader)) {
-            throw new VoteException(INVALID_CANDIDATE_TYPE, "후보자가 파트장 후보가 아닙니다.");
-        }
-
-        PartLeader partLeader = (PartLeader) candidate;
-
+        Candidate candidate = checkExistingCandidate(candidateId);
+        // 파트장/데모데이 투표 타입 확인
+        PartLeader partLeader = checkVoteTypeLeader(candidate);
         // 유저 정보 조회 + 파트 확인
-        UserEntity user = userService.findByUserId(userId);
-
-        if (!user.getPart().equals(partLeader.getPart())) {
-            throw new VoteException(INVALID_VOTE_PART);
-        }
-
-        // 중복 투표 확인 개선
-        List<Vote> allByUserId = voteRepository.findAllByUserId(userId);
-        for (Vote vote : allByUserId) {
-            Long voteCandidateId = vote.getCandidateId();
-            candidateRepository.findById(voteCandidateId).ifPresent(
-                    votedCandidate -> {
-                        if (votedCandidate.getType().equals(CandidateType.PART_LEADER)) {
-                            throw new VoteException(ALREADY_VOTED);
-                        }
-                    }
-            );
-
-        }
-//        if (voteRepository.existsByUserId(userId)) {
-//            throw new VoteException(ALREADY_VOTED);
-//        }
+        checkUserPartType(userId, partLeader);
+        // 이미 투표한 파트장 후보가 있는지 확인
+        checkDuplicatedVote(userId, CandidateType.PART_LEADER);
 
         // 투표 저장
-        Vote vote = Vote.builder()
-                .userId(userId)
-                .candidateId(candidateId)
-                .build();
+        saveVoteResult(Vote.of(userId, partLeader));
 
-        voteRepository.save(vote);
+        return getCandidateResultResponse(candidateId, partLeader);
     }
 
 
     @Transactional
-    public void voteDemoday(Long userId, Long candidateId) {
+    public CandidateResultResponse voteDemoday(Long userId, Long candidateId) {
 
         // 후보 존재 확인
-        Candidate candidate = candidateRepository.findById(candidateId)
-                .orElseThrow(() -> new VoteException(CANDIDATE_NOT_FOUND));
+        Candidate candidate = checkExistingCandidate(candidateId);
+        Demoday demoday = checkVoteTypeDemoday(candidate);
+        // 유저 exist 확인
+        userService.findByUserId(userId);
+        // 이미 투표한 데모데이 후보가 있는지 확인
+        checkDuplicatedVote(userId, CandidateType.DEMODAY);
 
-        if (!(candidate instanceof Demoday)) {
-            throw new VoteException(INVALID_CANDIDATE_TYPE, "후보자가 데모데이 후보가 아닙니다.");
-        }
-
-        Demoday demoday = (Demoday) candidate;
-        // 유저 정보 조회
-        UserEntity user = userService.findByUserId(userId);
-
-        // 중복 투표 확인 개선
-        List<Vote> allByUserId = voteRepository.findAllByUserId(userId);
-        for (Vote vote : allByUserId) {
-            Long voteCandidateId = vote.getCandidateId();
-            candidateRepository.findById(voteCandidateId).ifPresent(
-                    votedCandidate -> {
-                        if (votedCandidate.getType().equals(CandidateType.DEMODAY)) {
-                            throw new VoteException(ALREADY_VOTED);
-                        }
-                    }
-            );
-        }
         // 투표 저장
-        Vote vote = Vote.builder()
-                .userId(userId)
-                .candidateId(candidateId)
-                .build();
-        voteRepository.save(vote);
+        saveVoteResult(Vote.of(userId, candidate));
+
+        return getCandidateResultResponse(voteConverter.toCandidateResponse(demoday), candidateId);
     }
+
 
     public CandidateListResponse getCandidates() {
 
@@ -171,6 +124,56 @@ public class VoteService {
                 .toList();
 
         return new CandidateResultListResponse(CandidateType.DEMODAY, list);
+    }
+
+
+    private void checkDuplicatedVote(Long userId, CandidateType partLeader) {
+        boolean alreadyVotedLeader = voteRepository.existsByUserIdAndCandidate_Type(userId, partLeader);
+        if (alreadyVotedLeader) {
+            throw new VoteException(ALREADY_VOTED);
+        }
+    }
+
+    private void checkUserPartType(Long userId, PartLeader partLeader) {
+        UserEntity user = userService.findByUserId(userId);
+
+        if (!user.getPart().equals(partLeader.getPart())) {
+            throw new VoteException(INVALID_VOTE_PART);
+        }
+    }
+
+
+    private Candidate checkExistingCandidate(Long candidateId) {
+        return candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new VoteException(CANDIDATE_NOT_FOUND));
+    }
+
+    private PartLeader checkVoteTypeLeader(Candidate candidate) {
+        if (!(candidate instanceof PartLeader partLeader)) {
+            throw new VoteException(INVALID_CANDIDATE_TYPE, "후보자가 파트장 후보가 아닙니다.");
+        }
+        return partLeader;
+    }
+
+    private CandidateResultResponse getCandidateResultResponse(Long candidateId, PartLeader partLeader) {
+        return getCandidateResultResponse(voteConverter.toCandidateResponse(partLeader), candidateId);
+    }
+
+    private CandidateResultResponse getCandidateResultResponse(CandidateResponse voteConverter, Long candidateId) {
+        Long voteCount = voteRepository.countByCandidateId(candidateId);
+        return new CandidateResultResponse(voteConverter, voteCount);
+    }
+
+    private Demoday checkVoteTypeDemoday(Candidate candidate) {
+        if (!(candidate instanceof Demoday demoday)) {
+            throw new VoteException(INVALID_CANDIDATE_TYPE, "후보자가 데모데이 후보가 아닙니다.");
+        }
+        return demoday;
+    }
+
+
+    private void saveVoteResult(Vote vote) {
+        voteRepository.save(vote);
     }
 
 }
