@@ -46,7 +46,7 @@ public class VoteService {
                 .orElseThrow(() -> new VoteException(CANDIDATE_NOT_FOUND));
 
         if (!(candidate instanceof PartLeader)) {
-            throw new VoteException(INVALID_CANDIDATE_TYPE);
+            throw new VoteException(INVALID_CANDIDATE_TYPE, "후보자가 파트장 후보가 아닙니다.");
         }
 
         PartLeader partLeader = (PartLeader) candidate;
@@ -93,7 +93,7 @@ public class VoteService {
                 .orElseThrow(() -> new VoteException(CANDIDATE_NOT_FOUND));
 
         if (!(candidate instanceof Demoday)) {
-            throw new VoteException(INVALID_CANDIDATE_TYPE);
+            throw new VoteException(INVALID_CANDIDATE_TYPE, "후보자가 데모데이 후보가 아닙니다.");
         }
 
         Demoday demoday = (Demoday) candidate;
