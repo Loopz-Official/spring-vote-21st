@@ -21,7 +21,7 @@ public class VoteController {
     private final VoteService voteService;
 
     @PostMapping("/leader")
-    public ResponseEntity<Void> votePartLeader(@AuthenticationPrincipal User currentUser,
+    public ResponseEntity<String> votePartLeader(@AuthenticationPrincipal User currentUser,
                                        @RequestBody VoteRequestDto request) {
 
         String userId = currentUser.getUsername();
@@ -29,7 +29,19 @@ public class VoteController {
 
         voteService.votePartLeader(Long.parseLong(userId), request.candidateId());
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).body("Vote successful for part leader");
+    }
+
+    @PostMapping("/demoday")
+    public ResponseEntity<String> voteDemoday(@AuthenticationPrincipal User currentUser,
+                                           @RequestBody VoteRequestDto request) {
+
+        String userId = currentUser.getUsername();
+        log.info("Authenticated userId: {}", userId);
+
+        voteService.voteDemoday(Long.parseLong(userId), request.candidateId());
+
+        return ResponseEntity.status(HttpStatus.OK).body("Vote successful for demoday");
     }
 
 

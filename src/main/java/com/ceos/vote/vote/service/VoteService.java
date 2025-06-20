@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.ceos.vote.vote.Exception.VoteErrorCode.*;
@@ -57,10 +58,22 @@ public class VoteService {
             throw new VoteException(INVALID_VOTE_PART);
         }
 
-        // 중복 투표 확인
-        if (voteRepository.existsByUserId(userId)) {
-            throw new VoteException(ALREADY_VOTED);
+        // 중복 투표 확인 개선
+        List<Vote> allByUserId = voteRepository.findAllByUserId(userId);
+        for (Vote vote : allByUserId) {
+            Long voteCandidateId = vote.getCandidateId();
+            candidateRepository.findById(voteCandidateId).ifPresent(
+                    votedCandidate -> {
+                        if (votedCandidate.getType().equals(CandidateType.PART_LEADER)) {
+                            throw new VoteException(ALREADY_VOTED);
+                        }
+                    }
+            );
+
         }
+//        if (voteRepository.existsByUserId(userId)) {
+//            throw new VoteException(ALREADY_VOTED);
+//        }
 
         // 투표 저장
         Vote vote = Vote.builder()
@@ -68,6 +81,42 @@ public class VoteService {
                 .candidateId(candidateId)
                 .build();
 
+        voteRepository.save(vote);
+    }
+
+
+    @Transactional
+    public void voteDemoday(Long userId, Long candidateId) {
+
+        // 후보 존재 확인
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new VoteException(CANDIDATE_NOT_FOUND));
+
+        if (!(candidate instanceof Demoday)) {
+            throw new VoteException(INVALID_CANDIDATE_TYPE);
+        }
+
+        Demoday demoday = (Demoday) candidate;
+        // 유저 정보 조회
+        UserEntity user = userService.findByUserId(userId);
+
+        // 중복 투표 확인 개선
+        List<Vote> allByUserId = voteRepository.findAllByUserId(userId);
+        for (Vote vote : allByUserId) {
+            Long voteCandidateId = vote.getCandidateId();
+            candidateRepository.findById(voteCandidateId).ifPresent(
+                    votedCandidate -> {
+                        if (votedCandidate.getType().equals(CandidateType.DEMODAY)) {
+                            throw new VoteException(ALREADY_VOTED);
+                        }
+                    }
+            );
+        }
+        // 투표 저장
+        Vote vote = Vote.builder()
+                .userId(userId)
+                .candidateId(candidateId)
+                .build();
         voteRepository.save(vote);
     }
 
@@ -123,6 +172,7 @@ public class VoteService {
 
         return new CandidateResultListResponse(CandidateType.DEMODAY, list);
     }
+
 }
 
 

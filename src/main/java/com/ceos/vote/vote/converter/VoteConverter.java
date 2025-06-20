@@ -3,7 +3,6 @@ package com.ceos.vote.vote.converter;
 import com.ceos.vote.candidate.domain.Candidate;
 import com.ceos.vote.candidate.domain.Demoday;
 import com.ceos.vote.candidate.domain.PartLeader;
-import com.ceos.vote.vote.dto.CandidateListResponse;
 import com.ceos.vote.vote.dto.CandidateResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
