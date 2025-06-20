@@ -1,6 +1,7 @@
 package com.ceos.vote.vote.controller;
 
-import com.ceos.vote.security.dto.PrincipalUserDetails;
+import com.ceos.vote.vote.dto.CandidateListResponse;
+import com.ceos.vote.vote.dto.CandidateResultListResponse;
 import com.ceos.vote.vote.dto.VoteRequestDto;
 import com.ceos.vote.vote.service.VoteService;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/vote/v1")
@@ -22,7 +20,7 @@ public class VoteController {
 
     private final VoteService voteService;
 
-    @PostMapping("/partLeader")
+    @PostMapping("/leader")
     public ResponseEntity<Void> votePartLeader(@AuthenticationPrincipal User currentUser,
                                        @RequestBody VoteRequestDto request) {
 
@@ -33,4 +31,37 @@ public class VoteController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+
+    @GetMapping("/leader/candidates")
+    public ResponseEntity<CandidateListResponse> getCandidates() {
+
+        CandidateListResponse response = voteService.getCandidates();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
+
+    @GetMapping("/leader/candidates/result")
+    public ResponseEntity<CandidateResultListResponse> getCandidateResult() {
+
+        CandidateResultListResponse response = voteService.getCandidateResult();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
+
+    @GetMapping("/demoday/candidates")
+    public ResponseEntity<CandidateListResponse> getDemodayCandidates() {
+
+        CandidateListResponse response = voteService.getDemodayCandidates();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/demoday/candidates/result")
+    public ResponseEntity<CandidateResultListResponse> getDemodayCandidateResult() {
+
+        CandidateResultListResponse response = voteService.getDemodayCandidateResult();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
 }
