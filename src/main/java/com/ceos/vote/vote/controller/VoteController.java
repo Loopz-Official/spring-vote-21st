@@ -2,6 +2,7 @@ package com.ceos.vote.vote.controller;
 
 import com.ceos.vote.security.dto.PrincipalUserDetails;
 import com.ceos.vote.vote.dto.VoteRequestDto;
+import com.ceos.vote.vote.service.VoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,14 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class VoteController {
 
-//    private final VoteService voteService;
+    private final VoteService voteService;
 
-    @PostMapping
+    @PostMapping("/partLeader")
     public ResponseEntity<Void> votePartLeader(@AuthenticationPrincipal User currentUser,
                                        @RequestBody VoteRequestDto request) {
 
         String userId = currentUser.getUsername();
-        System.out.println("Current User ID: " + userId);
+        log.info("Authenticated userId: {}", userId);
+
+        voteService.votePartLeader(Long.parseLong(userId), request.candidateId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

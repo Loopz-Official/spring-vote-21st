@@ -29,11 +29,10 @@ public class UserService {
         return UserDto.from(user);
     }
 
-    //TODO: 존재하는 이메일이면 throw
 
-    public UserEntity findUserThrowIfNotFound(Long userId) {
+    public UserEntity findByUserId(Long userId) {
+
         return userRepository.findById(userId)
-                .orElseThrow(() -> new AuthException(USER_NOT_FOUND));
+                .orElseThrow(() -> new AuthException(USER_NOT_FOUND, String.format("User with ID %s not found", userId)));
     }
-
 }
