@@ -2,11 +2,16 @@ package com.ceos.vote.global.config;
 
 
 import com.ceos.vote.global.dto.CommonResponse;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import lombok.SneakyThrows;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +19,36 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenApiConfig {
+
+
+    @Bean
+    public OpenAPI openAPI() {
+        String jwtSchemeName = "JWT";
+
+        Components components = new Components()
+                .addSecuritySchemes(jwtSchemeName, new SecurityScheme()
+                        .name(jwtSchemeName)
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                );
+
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemeName);
+
+
+        return new OpenAPI()
+                .components(components)
+                .addSecurityItem(securityRequirement)
+                .addServersItem(new Server().url("/"))
+                .info(apiInfo());
+    }
+
+    private io.swagger.v3.oas.models.info.Info apiInfo() {
+        return new io.swagger.v3.oas.models.info.Info()
+                .title("CEOS VOTE API")
+                .version("v1")
+                .description("CEOS VOTE Backend API 문서");
+    }
 
     @Bean
     public OperationCustomizer operationCustomizer() {
