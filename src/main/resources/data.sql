@@ -25,27 +25,27 @@ INSERT INTO candidate (candidate_id, created_at, updated_at, type) VALUES
     (24, now(), now(), 'DEMODAY'),
     (25, now(), now(), 'DEMODAY');
 
-INSERT INTO PART_LEADER (part, candidate_id, name) VALUES
-('BACKEND', 1, '김준형'),
-('BACKEND', 2, '임도현'),
-('BACKEND', 3, '박정하'),
-('BACKEND', 4, '서채연'),
-('BACKEND', 5, '이석원'),
-('BACKEND', 6, '최근호'),
-('BACKEND', 7, '오지현'),
-('BACKEND', 8, '한혜수'),
-('BACKEND', 9, '박서연'),
-('BACKEND', 10, '박채연'),
-('FRONTEND', 11, '김철흥'),
-('FRONTEND', 12, '송아영'),
-('FRONTEND', 13, '권동욱'),
-('FRONTEND', 14, '김서연'),
-('FRONTEND', 15, '신수진'),
-('FRONTEND', 16, '원채영'),
-('FRONTEND', 17, '김영서'),
-('FRONTEND', 18, '이주희'),
-('FRONTEND', 19, '최서연'),
-('FRONTEND', 20, '한서정');
+INSERT INTO PART_LEADER (part, candidate_id, name,team) VALUES
+('BACKEND', 1, '김준형','LOOPZ'),
+('BACKEND', 2, '임도현','LOOPZ'),
+('BACKEND', 3, '박정하','PROMESA'),
+('BACKEND', 4, '서채연','PROMESA'),
+('BACKEND', 5, '이석원','HANIHOME'),
+('BACKEND', 6, '최근호','HANIHOME'),
+('BACKEND', 7, '오지현','DEARDREAM'),
+('BACKEND', 8, '한혜수','DEARDREAM'),
+('BACKEND', 9, '박서연','INFLUY'),
+('BACKEND', 10, '박채연','INFLUY'),
+('FRONTEND', 11, '김철흥','LOOPZ'),
+('FRONTEND', 12, '송아영','LOOPZ'),
+('FRONTEND', 13, '권동욱','PROMESA'),
+('FRONTEND', 14, '김서연','PROMESA'),
+('FRONTEND', 15, '신수진','HANIHOME'),
+('FRONTEND', 16, '원채영','HANIHOME'),
+('FRONTEND', 17, '김영서','DEARDREAM'),
+('FRONTEND', 18, '이주희','DEARDREAM'),
+('FRONTEND', 19, '최서연','INFLUY'),
+('FRONTEND', 20, '한서정','INFLUY');
 
 
 INSERT INTO demoday (candidate_id, team) VALUES
