@@ -43,6 +43,10 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/actuator/health",
+            "/vote/v1/leader/candidates",
+            "/vote/v1/leader/candidates/result",
+            "/vote/v1/demoday/candidates",
+            "/vote/v1/demoday/candidates/result",
     };
 
 

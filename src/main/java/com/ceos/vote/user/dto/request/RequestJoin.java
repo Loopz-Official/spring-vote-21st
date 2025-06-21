@@ -9,8 +9,6 @@ import jakarta.validation.constraints.NotNull;
 public record RequestJoin(
 
         @NotBlank
-        String loginId,
-        @NotBlank
         String password,
         @NotBlank
         @Email

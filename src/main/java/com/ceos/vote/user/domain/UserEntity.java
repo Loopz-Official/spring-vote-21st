@@ -65,7 +65,7 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
 
     public static UserEntity from(RequestJoin requestJoin, String encodedPassword) {
         return UserEntity.builder()
-                .loginId(requestJoin.loginId())
+                .loginId(requestJoin.email())
                 .realName(requestJoin.realName())
                 .password(encodedPassword)
                 .email(requestJoin.email())

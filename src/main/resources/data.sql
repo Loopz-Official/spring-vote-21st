@@ -1,0 +1,57 @@
+INSERT INTO candidate (candidate_id, created_at, updated_at, type) VALUES
+  (1, now(), now(), 'PART_LEADER'),
+  (2, now(), now(), 'PART_LEADER'),
+  (3, now(), now(), 'PART_LEADER'),
+  (4, now(), now(), 'PART_LEADER'),
+  (5, now(), now(), 'PART_LEADER'),
+  (6, now(), now(), 'PART_LEADER'),
+  (7, now(), now(), 'PART_LEADER'),
+  (8, now(), now(), 'PART_LEADER'),
+  (9, now(), now(), 'PART_LEADER'),
+  (10, now(), now(), 'PART_LEADER'),
+    (11, now(), now(), 'PART_LEADER'),
+    (12, now(), now(), 'PART_LEADER'),
+    (13, now(), now(), 'PART_LEADER'),
+    (14, now(), now(), 'PART_LEADER'),
+    (15, now(), now(), 'PART_LEADER'),
+    (16, now(), now(), 'PART_LEADER'),
+    (17, now(), now(), 'PART_LEADER'),
+    (18, now(), now(), 'PART_LEADER'),
+    (19, now(), now(), 'PART_LEADER'),
+    (20, now(), now(), 'PART_LEADER'),
+    (21, now(), now(), 'DEMODAY'),
+    (22, now(), now(), 'DEMODAY'),
+    (23, now(), now(), 'DEMODAY'),
+    (24, now(), now(), 'DEMODAY'),
+    (25, now(), now(), 'DEMODAY');
+
+INSERT INTO PART_LEADER (part, candidate_id, name) VALUES
+('BACKEND', 1, '김준형'),
+('BACKEND', 2, '임도현'),
+('BACKEND', 3, '박정하'),
+('BACKEND', 4, '서채연'),
+('BACKEND', 5, '이석원'),
+('BACKEND', 6, '최근호'),
+('BACKEND', 7, '오지현'),
+('BACKEND', 8, '한혜수'),
+('BACKEND', 9, '박서연'),
+('BACKEND', 10, '박채연'),
+('FRONTEND', 11, '김철흥'),
+('FRONTEND', 12, '송아영'),
+('FRONTEND', 13, '권동욱'),
+('FRONTEND', 14, '김서연'),
+('FRONTEND', 15, '신수진'),
+('FRONTEND', 16, '원채영'),
+('FRONTEND', 17, '김영서'),
+('FRONTEND', 18, '이주희'),
+('FRONTEND', 19, '최서연'),
+('FRONTEND', 20, '한서정');
+
+
+INSERT INTO demoday (candidate_id, team) VALUES
+(21, 'LOOPZ'),
+(22, 'HANIHOME'),
+(23, 'DEARDREAM'),
+(24, 'INFLUY'),
+(25, 'PROMESA');
+

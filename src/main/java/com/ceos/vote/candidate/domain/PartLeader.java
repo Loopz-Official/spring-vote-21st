@@ -15,5 +15,6 @@ public class PartLeader extends Candidate {
     @Column(nullable = false)
     private Part part;
 
+    @Column(name = "name")
     private String name;
 }

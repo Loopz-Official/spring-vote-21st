@@ -66,6 +66,8 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
                 .data(user)
                 .build();
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(common));
     }
 }
