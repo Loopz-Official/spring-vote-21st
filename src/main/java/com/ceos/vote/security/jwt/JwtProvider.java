@@ -1,6 +1,6 @@
 package com.ceos.vote.security.jwt;
 
-import com.ceos.vote.security.dto.PrincipalUserDetails;
+import com.ceos.vote.security.exception.SecurityErrorCode;
 import com.ceos.vote.security.exception.TokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,7 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.ceos.vote.security.exception.SecurityErrorCode.INVALID_SIGNATURE;
-import static com.ceos.vote.security.exception.SecurityErrorCode.INVALID_TOKEN;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Component
@@ -34,15 +32,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @RequiredArgsConstructor
 public class JwtProvider {
 
-
     @Value("${jwt.secret}")
     private String secret;
     @Value("${jwt.expiration.access}")
     private Long ACCESS_TOKEN_EXPIRE_TIME;
     @Value("${jwt.expiration.refresh}")
     private Long REFRESH_TOKEN_EXPIRE_TIME;
+
     private SecretKey secretKey;
-    private final UserDetailsService userDetailsService;
 
 
     @PostConstruct
@@ -50,6 +47,7 @@ public class JwtProvider {
         this.secretKey = new SecretKeySpec(secret.getBytes(UTF_8),
                                            Jwts.SIG.HS512.key().build().getAlgorithm());
     }
+
 
     public String generateAccessToken(Authentication authentication, String userId) {
         return generateToken(authentication, ACCESS_TOKEN_EXPIRE_TIME, "access", userId);
@@ -63,17 +61,23 @@ public class JwtProvider {
 
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining());
+                .collect(Collectors.joining(","));
 
         return Jwts.builder()
                 .subject(userId)
                 .claim("category", category)
-                .claim("email", authentication.getName())
                 .claim("authorities", authorities)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(secretKey)
                 .compact();
+    }
+
+
+    public Authentication getAuthenticationFromUserId(String userId) {
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        User principal = new User(userId, "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, null, authorities);
     }
 
     // 만료 되었을 때만 false 반환
@@ -85,9 +89,9 @@ public class JwtProvider {
         } catch (ExpiredJwtException e) {
             return false;
         } catch (MalformedJwtException e) {
-            throw new TokenException(INVALID_TOKEN);
+            throw new TokenException(SecurityErrorCode.INVALID_TOKEN);
         } catch (SecurityException e) {
-            throw new TokenException(INVALID_SIGNATURE);
+            throw new TokenException(SecurityErrorCode.INVALID_SIGNATURE);
         }
     }
 
@@ -103,9 +107,11 @@ public class JwtProvider {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        PrincipalUserDetails principal = (PrincipalUserDetails) userDetailsService.loadUserByUsername(claims.get("email", String.class));
+        // security User
+        User principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
+
 
     private Claims parseClaims(String token) {
         try {
@@ -120,7 +126,5 @@ public class JwtProvider {
     public String getSubject(String token) {
         return parseClaims(token).getSubject();
     }
-
-
 
 }

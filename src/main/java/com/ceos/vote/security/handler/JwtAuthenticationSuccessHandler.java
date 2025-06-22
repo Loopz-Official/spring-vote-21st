@@ -2,6 +2,7 @@ package com.ceos.vote.security.handler;
 
 import com.ceos.vote.global.dto.CommonResponse;
 import com.ceos.vote.redis.service.RefreshTokenRedisService;
+import com.ceos.vote.security.constants.SecurityConstants;
 import com.ceos.vote.security.dto.PrincipalUserDetails;
 import com.ceos.vote.security.jwt.JwtProvider;
 import com.ceos.vote.user.dto.UserDto;
@@ -12,11 +13,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
+import static com.ceos.vote.security.constants.SecurityConstants.*;
+import static org.springframework.http.HttpHeaders.*;
 
 @Component
 @Slf4j
@@ -35,20 +40,22 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        String userId = findUserIdFromAuthentication(authentication);
+        Long userId = findUserIdFromAuthentication(authentication);
 
-        String accessToken = jwtProvider.generateAccessToken(authentication, userId);
-        String refreshToken = jwtProvider.generateRefreshToken(authentication, userId);
 
-        refreshTokenRedisService.saveRefreshToken(Long.parseLong(userId), refreshToken, refreshTokenExpiration);
+        String accessToken = jwtProvider.generateAccessToken(authentication, userId.toString());
+        String refreshToken = jwtProvider.generateRefreshToken(authentication, userId.toString());
 
-        response.setHeader("access", accessToken);
+        refreshTokenRedisService.saveRefreshToken(userId, refreshToken, refreshTokenExpiration);
+
+        String bearerAccess = TOKEN_PREFIX + accessToken;
+        response.setHeader(AUTHORIZATION, bearerAccess);
         writeBodyWithUserDto(response, authentication);
     }
 
-    private String findUserIdFromAuthentication(Authentication authentication) {
+    private Long findUserIdFromAuthentication(Authentication authentication) {
         PrincipalUserDetails principal = (PrincipalUserDetails) authentication.getPrincipal();
-        return principal.getUserEntity().getId().toString();
+        return principal.getUserEntity().getId();
     }
 
     private void writeBodyWithUserDto(HttpServletResponse response, Authentication authentication) throws IOException {
@@ -59,6 +66,8 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
                 .data(user)
                 .build();
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(common));
     }
 }

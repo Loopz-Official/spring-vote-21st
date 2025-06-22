@@ -22,8 +22,8 @@ import static lombok.AccessLevel.*;
 public class UserEntity extends BaseTimeEntityWithDeletion {
 
     @Id
+    @Column(name="user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long id;
 
     //가입할 때 작성할 ID
@@ -65,7 +65,7 @@ public class UserEntity extends BaseTimeEntityWithDeletion {
 
     public static UserEntity from(RequestJoin requestJoin, String encodedPassword) {
         return UserEntity.builder()
-                .loginId(requestJoin.loginId())
+                .loginId(requestJoin.email())
                 .realName(requestJoin.realName())
                 .password(encodedPassword)
                 .email(requestJoin.email())
