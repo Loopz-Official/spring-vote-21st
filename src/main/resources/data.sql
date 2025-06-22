@@ -23,7 +23,8 @@ INSERT INTO candidate (candidate_id, created_at, updated_at, type) VALUES
     (22, now(), now(), 'DEMODAY'),
     (23, now(), now(), 'DEMODAY'),
     (24, now(), now(), 'DEMODAY'),
-    (25, now(), now(), 'DEMODAY');
+    (25, now(), now(), 'DEMODAY')
+    ON CONFLICT (candidate_id) DO NOTHING;
 
 INSERT INTO PART_LEADER (part, candidate_id, name,team) VALUES
 ('BACKEND', 1, '김준형','LOOPZ'),
@@ -45,7 +46,9 @@ INSERT INTO PART_LEADER (part, candidate_id, name,team) VALUES
 ('FRONTEND', 17, '김영서','DEARDREAM'),
 ('FRONTEND', 18, '이주희','DEARDREAM'),
 ('FRONTEND', 19, '최서연','INFLUY'),
-('FRONTEND', 20, '한서정','INFLUY');
+('FRONTEND', 20, '한서정','INFLUY')
+    ON CONFLICT (candidate_id) DO UPDATE SET
+    team = EXCLUDED.team;
 
 
 INSERT INTO demoday (candidate_id, team) VALUES
@@ -53,5 +56,5 @@ INSERT INTO demoday (candidate_id, team) VALUES
 (22, 'HANIHOME'),
 (23, 'DEARDREAM'),
 (24, 'INFLUY'),
-(25, 'PROMESA');
-
+(25, 'PROMESA')
+ON CONFLICT (candidate_id) DO NOTHING;
