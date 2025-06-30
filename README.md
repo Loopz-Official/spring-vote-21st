@@ -71,3 +71,247 @@
   - loopz.co.kr (메인 페이지) OR vercel
 
 ![](https://velog.velcdn.com/images/grammi_boii/post/7dc5496e-559b-4ff1-8846-b763bdbe6764/image.png)
+
+
+데이터 초기화
+
+![](https://velog.velcdn.com/images/grammi_boii/post/ae2e2545-e401-4be8-bfb0-a76090a12cdf/image.png)
+
+
+아키텍쳐
+
+![](https://velog.velcdn.com/images/grammi_boii/post/685a977d-06d0-4dc0-be23-b3252c6caf4a/image.png)
+
+
+모니터링 - vote에 미완성
+
+![](https://velog.velcdn.com/images/grammi_boii/post/78a49eb3-1371-4e3b-a2ca-8991641f8dc1/image.png)
+
+액츄에이터
+```
+{
+    "status": 200,
+    "message": "OK",
+    "data": {
+        "status": "UP",
+        "components": {
+            "db": {
+                "status": "UP",
+                "details": {
+                    "database": "PostgreSQL",
+                    "validationQuery": "isValid()"
+                }
+            },
+            "diskSpace": {
+                "status": "UP",
+                "details": {
+                    "total": 30083776512,
+                    "free": 20612050944,
+                    "threshold": 10485760,
+                    "path": "/.",
+                    "exists": true
+                }
+            },
+            "ping": {
+                "status": "UP"
+            },
+            "redis": {
+                "status": "UP",
+                "details": {
+                    "version": "8.0.1"
+                }
+            },
+            "ssl": {
+                "status": "UP",
+                "details": {
+                    "validChains": [],
+                    "invalidChains": []
+                }
+            }
+        }
+    }
+}
+```
+
+api - postman
+
+![](https://velog.velcdn.com/images/grammi_boii/post/c32bd316-9fc5-4c45-839d-01466ae9b2b8/image.png)
+
+공통 응답 포맷 - intercpetor 구현
+
+
+![](https://velog.velcdn.com/images/grammi_boii/post/27d03bfa-5ff8-4960-8de8-479233732ee7/image.png)
+
+
+```
+{
+    "status": 200,
+    "message": "OK",
+    "data": {
+        "candidateType": "PART_LEADER",
+        "candidates": [
+            {
+                "id": 1,
+                "part": "BACKEND",
+                "name": "김준형"
+            },
+            {
+                "id": 2,
+                "part": "BACKEND",
+                "name": "임도현"
+            },
+            {
+                "id": 3,
+                "part": "BACKEND",
+                "name": "박정하"
+            },
+            {
+                "id": 4,
+                "part": "BACKEND",
+                "name": "서채연"
+            },
+            {
+                "id": 5,
+                "part": "BACKEND",
+                "name": "이석원"
+            },
+            {
+                "id": 6,
+                "part": "BACKEND",
+                "name": "최근호"
+            },
+            {
+                "id": 7,
+                "part": "BACKEND",
+                "name": "오지현"
+            },
+            {
+                "id": 8,
+                "part": "BACKEND",
+                "name": "한혜수"
+            },
+            {
+                "id": 9,
+                "part": "BACKEND",
+                "name": "박서연"
+            },
+            {
+                "id": 10,
+                "part": "BACKEND",
+                "name": "박채연"
+            },
+            {
+                "id": 11,
+                "part": "FRONTEND",
+                "name": "김철흥"
+            },
+            {
+                "id": 12,
+                "part": "FRONTEND",
+                "name": "송아영"
+            },
+            {
+                "id": 13,
+                "part": "FRONTEND",
+                "name": "권동욱"
+            },
+            {
+                "id": 14,
+                "part": "FRONTEND",
+                "name": "김서연"
+            },
+            {
+                "id": 15,
+                "part": "FRONTEND",
+                "name": "신수진"
+            },
+            {
+                "id": 16,
+                "part": "FRONTEND",
+                "name": "원채영"
+            },
+            {
+                "id": 17,
+                "part": "FRONTEND",
+                "name": "김영서"
+            },
+            {
+                "id": 18,
+                "part": "FRONTEND",
+                "name": "이주희"
+            },
+            {
+                "id": 19,
+                "part": "FRONTEND",
+                "name": "최서연"
+            },
+            {
+                "id": 20,
+                "part": "FRONTEND",
+                "name": "한서정"
+            }
+        ]
+    }
+}
+```
+
+```java
+package com.ceos.vote.global.handler;
+
+import com.ceos.vote.global.dto.CommonResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.MethodParameter;
+import org.springframework.http.MediaType;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpResponse;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+@RestControllerAdvice
+public class ResponseInterceptor implements ResponseBodyAdvice {
+
+    @Override
+    public boolean supports(MethodParameter returnType, Class converterType) {
+        return true;
+    }
+
+    @Override
+    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+
+        if (body instanceof CommonResponse) {
+            return body;
+        }
+
+        int status = ((ServletServerHttpResponse) response).getServletResponse().getStatus();
+
+        // swagger 제외
+        String path = request.getURI().getPath();
+        if (path.contains("swagger") || path.contains("api-docs") || path.contains("webjars")) {
+            return body;
+        }
+
+        // 조건부 메시지 처리: 2xx -> "Success", 그 외 -> "Error"
+        String message = (status >= 200 && status < 300) ? "OK" : "Error";
+
+        CommonResponse<Object> commonResponse = new CommonResponse<>();
+        commonResponse.setStatus(status);
+        commonResponse.setMessage(message);
+        commonResponse.setData(body);
+
+        // 응답을 String으로 내는 경우 따로 예외처리
+        if (body instanceof String) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                return objectMapper.writeValueAsString(commonResponse);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("String response conversion error", e);
+            }
+        }
+        return commonResponse;
+    }
+
+}
+
+```
